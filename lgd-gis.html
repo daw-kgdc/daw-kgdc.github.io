@@ -93,11 +93,14 @@
         });
         
         basemap.addTo(mymap);
-
+        
         L.geoPackageFeatureLayer([], {
             // geoPackageUrl: 'http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
             geoPackageUrl: 'static/karn-districts.gpkg',
-            layerName: 'tumkur'
+            layerName: 'tumkur',
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup('<p><b>' + feature.properties.toString() +'</b></p>');
+            }
         }).addTo(mymap);
     </script>
 </body>
