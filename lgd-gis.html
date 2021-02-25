@@ -99,7 +99,7 @@
             geoPackageUrl: 'static/karn-districts.gpkg',
             layerName: 'tumkur',
             onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + feature.properties.toString() +'</b></p>');
+                layer.bindPopup('<p><b>' + JSON.stringify(feature.properties) +'</b></p>');
             }
         }).addTo(mymap);
     </script>
