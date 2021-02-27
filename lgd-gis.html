@@ -48,10 +48,25 @@
 
     <div class="settings" style="position: absolute; bottom: 0; right: 0; z-index: 10000; color: white;">
         <div id="options" class="scale-transition scale-out">
-            <label>
-                <input type="checkbox" id="basemap" checked/>
-                <span>BaseMap</span>
-            </label><br/>
+                <select id='districtgpkg'>
+                  <option disabled selected>Select District</option>
+                  <option>Belagavi</option>
+                  <option>Davanagere</option>
+                  <option>Hassan</option>
+                  <option>Kalburgi</option>
+                  <option>Mysuru</option>
+                  <option>Ramanagara</option>
+                  <option>Tumakuru</option>
+                </select><br/>
+                <label>
+                    <input type="checkbox" id="basemap" checked/>
+                    <span>BaseMap</span>
+                </label><br/>
+                <label>
+                    <input type="checkbox" id="villageslyr" checked/>
+                    <span>Villages Layer</span>
+                </label>
+            <br/>
         </div>
   
         <a id="scale-maps" class="btn-floating blue waves-effect btn waves-light right">
@@ -68,6 +83,14 @@
     <script src="static/js/leaflet-geopackage.min.js"></script>
 
     <script>
+        $( document ).ready(function() {
+            initializeScripts();
+        });
+
+        function initializeScripts(){
+            $('select').formSelect();
+        }
+
         $('#scale-maps').click(function(){
             $("#options").toggleClass("scale-out");
         });
@@ -87,21 +110,79 @@
 
         mymap.on('mousemove', latlngDisp);
 
-        basemap = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
-            maxZoom: 20,
-            subdomains:['mt0','mt1','mt2','mt3']
-        });
-        
-        basemap.addTo(mymap);
-        
-        L.geoPackageFeatureLayer([], {
-            // geoPackageUrl: 'http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
-            geoPackageUrl: 'static/karn-districts.gpkg',
-            layerName: 'tumkur',
-            onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + JSON.stringify(feature.properties) +'</b></p>');
+        let basemaplyr = null;
+        addBaseMap();
+
+        let basemapcheck = document.getElementById('basemap');
+        basemapcheck.onchange = function () {
+            console.log(basemaplyr);
+            if(basemaplyr != null){
+                mymap.removeLayer(basemaplyr);
+                basemaplyr = null;
+            } else {
+                addBaseMap();
             }
+        }
+
+        function addBaseMap(){
+            basemaplyr = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains:['mt0','mt1','mt2','mt3']
+            });
+            
+            basemaplyr.addTo(mymap);
+        }
+
+        L.geoPackageFeatureLayer([], {
+            style: function (feature) {
+                return {
+                    color: "violet",
+                    weight: 2,
+                    fill: false,
+                    opacity: 1,
+                    clickable: false
+                };
+            },
+            geoPackageUrl: 'https://raw.githubusercontent.com/daw-kgdc/file-host-permanent/main/karn-geopackages/KarnDist.gpkg',
+            layerName: 'District_Boundary',
         }).addTo(mymap);
+
+        let gpkgvillageslyr = null;
+        let districtselect = document.getElementById('districtgpkg');
+        districtselect.onchange = function () {
+            if(gpkgvillageslyr != null){
+                mymap.removeLayer(gpkgvillageslyr);
+                gpkgvillageslyr = null;
+            }
+
+            if($("#villageslyr").is(':checked')){
+                loadVillagesLayer();
+            }
+        }
+
+        function loadVillagesLayer(){
+            let geopackagename = $(districtselect).find('option:selected').text();
+            let gpkgPath = 'https://raw.githubusercontent.com/daw-kgdc/file-host-permanent/main/karn-geopackages/' + geopackagename + '.gpkg';
+            console.log(gpkgPath);
+            gpkgvillageslyr = L.geoPackageFeatureLayer([], {
+                geoPackageUrl: gpkgPath,
+                layerName: geopackagename,
+                onEachFeature: function (feature, layer) {
+                    layer.bindPopup('<p><b>' + JSON.stringify(feature.properties) +'</b></p>');
+                }
+            }).addTo(mymap);
+        }
+        
+        let villageslyrcheck = document.getElementById('villageslyr');
+        villageslyrcheck.onchange = function () {
+            console.log(gpkgvillageslyr);
+            if(gpkgvillageslyr != null){
+                mymap.removeLayer(gpkgvillageslyr);
+                gpkgvillageslyr = null;
+            } else {
+                loadVillagesLayer();
+            }
+        }
     </script>
 </body>
 </html>
