@@ -36,12 +36,12 @@
 
     <div class="settings" style="position: absolute; bottom: 0; left: 0; z-index: 10000; color: white;">
         <div id="layers" class="scale-transition scale-out">
-            <label>
-                Layers
-            </label>
+            <div class="btn">
+                <input type="file" id="kmlfileinput">
+            </div>
         </div>
   
-        <a id="scale-layers" class="btn-floating green waves-effect btn waves-light">
+        <a id="scale-layers" class="btn-floating orange waves-effect btn waves-light">
             <i class="large material-icons">attach_file</i>
         </a>
     </div>
@@ -81,6 +81,7 @@
     <script src="static/js/leaflet.js"></script>
     <script src="static/js/L.Control.ZoomBox.min.js"></script>
     <script src="static/js/leaflet-geopackage.min.js"></script>
+    <script src="static/js/leaflet-kmz.js"></script>
 
     <script>
         $( document ).ready(function() {
@@ -99,6 +100,8 @@
             $("#layers").toggleClass("scale-out");
         });
 
+        //  ----------------------------------------------------------------------------------------------------------------
+
         let mymap = L.map('mapid').setView([14.8810453,76.273253], 7);
         let options = { modal: true, title: "Box Area Zoom" };
         let control = L.control.zoomBox(options);
@@ -109,6 +112,8 @@
         }
 
         mymap.on('mousemove', latlngDisp);
+
+        //  ----------------------------------------------------------------------------------------------------------------
 
         let basemaplyr = null;
         // addBaseMap();
@@ -133,6 +138,8 @@
             basemaplyr.addTo(mymap);
         }
 
+        //  ----------------------------------------------------------------------------------------------------------------
+
         L.geoPackageFeatureLayer([], {
             style: function (feature) {
                 return {
@@ -146,6 +153,8 @@
             geoPackageUrl: 'https://raw.githubusercontent.com/daw-kgdc/file-host-permanent/main/karn-geopackages/KarnDist.gpkg',
             layerName: 'District_Boundary',
         }).addTo(mymap);
+
+        //  ----------------------------------------------------------------------------------------------------------------
 
         let gpkgvillageslyr = null;
         let districtselect = document.getElementById('districtgpkg');
@@ -193,6 +202,29 @@
                 loadVillagesLayer();
             }
         }
+
+        //  ----------------------------------------------------------------------------------------------------------------
+        let kmzlyr = L.kmzLayer().addTo(mymap);;
+
+        kmzlyr.on('load', function(e) {
+            mymap.fitBounds(kmzlyr.getBounds());
+            console.log(kmzlyr);
+        });
+
+        let fileinput = document.getElementById('kmlfileinput');
+        fileinput.onchange = function (){
+            let file = this.files[0];
+            let fileName = file.name;
+
+            let reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            reader.onload = function (e){
+                file_content = e.target.result;
+                console.log(file_content);
+                kmzlyr.load([file_content, fileName]);                
+            };
+        }
+
     </script>
 </body>
 </html>
