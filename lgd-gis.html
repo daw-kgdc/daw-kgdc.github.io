@@ -59,7 +59,7 @@
                   <option>Tumakuru</option>
                 </select><br/>
                 <label>
-                    <input type="checkbox" id="basemap" checked/>
+                    <input type="checkbox" id="basemap"/>
                     <span>BaseMap</span>
                 </label><br/>
                 <label>
@@ -111,7 +111,7 @@
         mymap.on('mousemove', latlngDisp);
 
         let basemaplyr = null;
-        addBaseMap();
+        // addBaseMap();
 
         let basemapcheck = document.getElementById('basemap');
         basemapcheck.onchange = function () {
@@ -162,13 +162,23 @@
 
         function loadVillagesLayer(){
             let geopackagename = $(districtselect).find('option:selected').text();
+            if(geopackagename == 'Select District'){
+                return 0;
+            }
+
             let gpkgPath = 'https://raw.githubusercontent.com/daw-kgdc/file-host-permanent/main/karn-geopackages/' + geopackagename + '.gpkg';
             console.log(gpkgPath);
             gpkgvillageslyr = L.geoPackageFeatureLayer([], {
                 geoPackageUrl: gpkgPath,
                 layerName: geopackagename,
                 onEachFeature: function (feature, layer) {
-                    layer.bindPopup('<p><b>' + JSON.stringify(feature.properties) +'</b></p>');
+                    let popupHTML = '<div><b>LGD Code: ' + feature.properties.lgd_villag + '</b></div>';
+                    popupHTML += '<div><b>Village: ' + feature.properties.kgisvill_2 + '</b></div>';
+                    popupHTML += '<div><b>Gram Panchayat: ' + feature.properties.lgdgpname + '</b></div>';
+                    popupHTML += '<div><b>Hobli: ' + feature.properties.kgishoblin + '</b></div>';
+                    popupHTML += '<div><b>Taluk: ' + feature.properties.kgistalukn + '</b></div>';
+                    popupHTML += '<div><b>District: ' + feature.properties.kgisdist_1 + '</b></div>';
+                    layer.bindPopup(popupHTML);
                 }
             }).addTo(mymap);
         }
