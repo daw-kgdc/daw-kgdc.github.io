@@ -204,15 +204,22 @@
         }
 
         //  ----------------------------------------------------------------------------------------------------------------
-        let kmzlyr = L.kmzLayer().addTo(mymap);;
-
-        kmzlyr.on('load', function(e) {
-            mymap.fitBounds(kmzlyr.getBounds());
-            console.log(kmzlyr);
-        });
+        let kmzlyr = null;
 
         let fileinput = document.getElementById('kmlfileinput');
         fileinput.onchange = function (){
+            if(kmzlyr != null){
+                mymap.removeLayer(kmzlyr);
+                kmzlyr = null;
+            }
+
+            kmzlyr = L.kmzLayer().addTo(mymap);;
+
+            kmzlyr.on('load', function(e) {
+                mymap.fitBounds(kmzlyr.getBounds());
+                // console.log(kmzlyr);
+            });
+
             let file = this.files[0];
             let fileName = file.name;
 
@@ -220,7 +227,7 @@
             reader.readAsArrayBuffer(file);
             reader.onload = function (e){
                 file_content = e.target.result;
-                console.log(file_content);
+                // console.log(file_content);
                 kmzlyr.load([file_content, fileName]);                
             };
         }
