@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shapefiles To GeoJSON</title>
+</head>
+<body>
+    <input type="checkbox" id="optimize"/>Optimize<br/><br/>
+    <input type="file" id="shapefileinput" onchange="readShapeFiles();"/><br/><br/>
+    <button onclick="downloadGJCSV();">Download</button><br/><br/>
+    <div id="status"></div><br/>
+    
+    <script src="https://daw-kgdc.github.io/file-host-permanent/daw-kgdc-flights-gis/js/shp.js"></script>
+    <script>
+        let flightIDsArry = [];
+        let optimize = false;
+        function readShapeFiles(){
+            document.getElementById('status').innerText = 'Loading...';
+
+            let file = document.getElementById("shapefileinput").files[0];
+            let reader = new FileReader();
+            reader.onload = function() {
+                let result = reader.result
+
+                shp(result).then(function(geojson){
+                    handleGeoJSONs(geojson);
+                });
+            }
+            reader.readAsArrayBuffer(file);
+
+        }
+
+        function handleGeoJSONs(geojson){
+            let checkBox = document.getElementById("optimize");
+            if (checkBox.checked == true){
+                optimize = true;
+            } else {
+                optimize = false;
+            }
+
+            // console.log(geojson);
+
+            let features = geojson.features;
+
+            for (let i = 0; i < features.length; i++){
+                let feature = features[i];
+                let flightID = feature.properties.FLIGHT_ID_;
+
+                if(optimize){
+                    let featGeomCoords = feature.geometry.coordinates;
+
+                    let numberofCoordsReqd = 500 * 2;
+                    let modulus = parseInt(featGeomCoords.length / numberofCoordsReqd);
+                    // console.log(modulus);
+                    
+                    featGeomCoords = featGeomCoords.filter((element, index) => {
+                        return index % modulus == 0;
+                    });
+
+                    feature.geometry.coordinates = featGeomCoords;
+                }
+
+                let gj = {
+                    type: geojson.type,
+                    fileName: geojson.fileName,
+                    features: [feature]
+                };
+
+                flightIDsArry.push([flightID, JSON.stringify(gj)]); 
+            }
+
+            console.log(flightIDsArry);
+
+            document.getElementById('status').innerText = 'Loaded...';
+        }
+
+        function downloadGJCSV(){
+            if(Object.keys(flightIDsObj).length === 0){
+                document.getElementById('status').innerText = 'Load a Shapefile...';
+                return 0;
+            }
+
+            exportToCsv('GeoJSONs_FlightIDs.csv', flightIDsArry);
+            document.getElementById('status').innerText = 'Exported...';
+        }
+
+        function exportToCsv(filename, rows) {
+            let processRow = function (row) {
+                let finalVal = '';
+                for (let j = 0; j < row.length; j++) {
+                    let innerValue = row[j] === null ? '' : row[j].toString();
+                    let result = innerValue.replace(/"/g, '""');
+                    if (result.search(/("|,|\n)/g) >= 0)
+                        result = '"' + result + '"';
+                    if (j > 0)
+                        finalVal += ',';
+                    finalVal += result;
+                }
+                return finalVal + '\n';
+            };
+
+            let csvFile = '';
+            for (let i = 0; i < rows.length; i++) {
+                csvFile += processRow(rows[i]);
+            }
+
+            let blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, filename);
+            } else {
+                let link = document.createElement("a");
+                if (link.download !== undefined) { // feature detection
+                    // Browsers that support HTML5 download attribute
+                    let url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", filename);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
