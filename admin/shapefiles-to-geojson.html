@@ -77,7 +77,7 @@
         }
 
         function downloadGJCSV(){
-            if(Object.keys(flightIDsObj).length === 0){
+            if(flightIDsArry.length == 0){
                 document.getElementById('status').innerText = 'Load a Shapefile...';
                 return 0;
             }
