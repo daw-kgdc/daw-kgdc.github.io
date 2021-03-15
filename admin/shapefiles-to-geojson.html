@@ -13,6 +13,7 @@
     <div id="status"></div><br/>
     
     <script src="https://daw-kgdc.github.io/file-host-permanent/daw-kgdc-flights-gis/js/shp.js"></script>
+    <script src="https://daw-kgdc.github.io/file-host-permanent/daw-kgdc-flights-gis/js/xlsx.full.min.js"></script>
     <script>
         let flightIDsArry = [];
         let optimize = false;
@@ -82,46 +83,12 @@
                 return 0;
             }
 
-            exportToCsv('GeoJSONs_FlightIDs.csv', flightIDsArry);
+            let wb = XLSX.utils.book_new();
+            let ws = XLSX.utils.aoa_to_sheet(flightIDsArry);
+            XLSX.utils.book_append_sheet(wb, ws, 'DPR_Drone_Flying');
+            XLSX.writeFile(wb, 'GeoJSONs_FlightIDs.xlsx');
+
             document.getElementById('status').innerText = 'Exported...';
-        }
-
-        function exportToCsv(filename, rows) {
-            let processRow = function (row) {
-                let finalVal = '';
-                for (let j = 0; j < row.length; j++) {
-                    let innerValue = row[j] === null ? '' : row[j].toString();
-                    let result = innerValue.replace(/"/g, '""');
-                    if (result.search(/("|,|\n)/g) >= 0)
-                        result = '"' + result + '"';
-                    if (j > 0)
-                        finalVal += ',';
-                    finalVal += result;
-                }
-                return finalVal + '\n';
-            };
-
-            let csvFile = '';
-            for (let i = 0; i < rows.length; i++) {
-                csvFile += processRow(rows[i]);
-            }
-
-            let blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
-            if (navigator.msSaveBlob) { // IE 10+
-                navigator.msSaveBlob(blob, filename);
-            } else {
-                let link = document.createElement("a");
-                if (link.download !== undefined) { // feature detection
-                    // Browsers that support HTML5 download attribute
-                    let url = URL.createObjectURL(blob);
-                    link.setAttribute("href", url);
-                    link.setAttribute("download", filename);
-                    link.style.visibility = 'hidden';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }
-            }
         }
     </script>
 </body>
