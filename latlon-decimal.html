@@ -14,19 +14,19 @@
 </head>
 <body>
     <div id="app" style="text-align: center;">
-        <h1>Latitude / Longitude To Decimal Converter</h1>
+        <h3 style="display: inline-block; margin: 0;">Latitude / Longitude To Decimal Converter</h3>
         <div>
-            <h2 style="display: inline-block;">Latitude (DMS)</h2>
+            <h4 style="display: inline-block;">Latitude (DMS)</h4><br/>
             <span class="tab"></span>
 
             <input onClick="this.select();" type="number" v-model="latDeg" style="width: 80px;"/>
             <span class="tab"></span>
-            <span>Degrees</span>
+            <span>Degrees</span><br/>
 
             <span class="tab"></span>
             <input onClick="this.select();" type="number" v-model="latMin" style="width: 80px;"/>
             <span class="tab"></span>
-            <span>Minutes</span>
+            <span>Minutes</span><br/>
             <span class="tab"></span>
 
             <input onClick="this.select();" type="number" v-model="latSec" style="width: 80px;"/>
@@ -34,17 +34,17 @@
             <span>Seconds</span>
         </div>
         <div>
-            <h2 style="display: inline-block;">Longitude (DMS)</h2>
+            <h4 style="display: inline-block;">Longitude (DMS)</h4><br/>
             <span class="tab"></span>
 
             <input onClick="this.select();" type="number" v-model="lonDeg" style="width: 80px;"/>
             <span class="tab"></span>
-            <span>Degrees</span>
+            <span>Degrees</span><br/>
 
             <span class="tab"></span>
             <input onClick="this.select();" type="number" v-model="lonMin" style="width: 80px;"/>
             <span class="tab"></span>
-            <span>Minutes</span>
+            <span>Minutes</span><br/>
             <span class="tab"></span>
 
             <input onClick="this.select();" type="number" v-model="lonSec" style="width: 80px;"/>
@@ -52,20 +52,20 @@
             <span>Seconds</span>
         </div>
 
-        <br/><br/><br/>
+        <br/>
 
         <div>
-            <h2 style="display: inline-block;">Latitude (Decimal):</h2>
+            <h4 style="display: inline-block; margin: 0px;">Latitude (Decimal):</h4>
             <span class="tab"></span>
-            <h2 style="display: inline-block;">
+            <h3 style="display: inline-block; margin: 0px;">
                 {{latitudeDecimal}}
-            </h2><br/>
+            </h3><br/>
 
-            <h2 style="display: inline-block;">Longitude (Decimal)</h2>
+            <h4 style="display: inline-block; margin: 0px;">Longitude (Decimal):</h2>
             <span class="tab"></span>
-            <h2 style="display: inline-block;">
+            <h3 style="display: inline-block; margin: 0px;">
                 {{longitudeDecimal}}
-            </h2>
+            </h3>
         </div>
     </div>
 
