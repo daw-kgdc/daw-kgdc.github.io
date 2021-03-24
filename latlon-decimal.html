@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lat-Lon To Decimal</title>
+    <style>
+        .tab {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" style="text-align: center;">
+        <h1>Latitude / Longitude To Decimal Converter</h1>
+        <div>
+            <h2 style="display: inline-block;">Latitude (DMS)</h2>
+            <span class="tab"></span>
+
+            <input onClick="this.select();" type="number" v-model="latDeg" style="width: 80px;"/>
+            <span class="tab"></span>
+            <span>Degrees</span>
+
+            <span class="tab"></span>
+            <input onClick="this.select();" type="number" v-model="latMin" style="width: 80px;"/>
+            <span class="tab"></span>
+            <span>Minutes</span>
+            <span class="tab"></span>
+
+            <input onClick="this.select();" type="number" v-model="latSec" style="width: 80px;"/>
+            <span class="tab"></span>
+            <span>Seconds</span>
+        </div>
+        <div>
+            <h2 style="display: inline-block;">Longitude (DMS)</h2>
+            <span class="tab"></span>
+
+            <input onClick="this.select();" type="number" v-model="lonDeg" style="width: 80px;"/>
+            <span class="tab"></span>
+            <span>Degrees</span>
+
+            <span class="tab"></span>
+            <input onClick="this.select();" type="number" v-model="lonMin" style="width: 80px;"/>
+            <span class="tab"></span>
+            <span>Minutes</span>
+            <span class="tab"></span>
+
+            <input onClick="this.select();" type="number" v-model="lonSec" style="width: 80px;"/>
+            <span class="tab"></span>
+            <span>Seconds</span>
+        </div>
+
+        <br/><br/><br/>
+
+        <div>
+            <h2 style="display: inline-block;">Latitude (Decimal):</h2>
+            <span class="tab"></span>
+            <h2 style="display: inline-block;">
+                {{latitudeDecimal}}
+            </h2><br/>
+
+            <h2 style="display: inline-block;">Longitude (Decimal)</h2>
+            <span class="tab"></span>
+            <h2 style="display: inline-block;">
+                {{longitudeDecimal}}
+            </h2>
+        </div>
+    </div>
+
+    <script src="https://daw-kgdc.github.io/file-host-permanent/daw-kgdc-flights-gis/js/vue3.global.js"></script>
+    <script>
+        const App = Vue.createApp({
+            data: function() {
+                return {
+                    latDeg: 0,
+                    latMin: 0,
+                    latSec: 0,
+                    lonDeg: 0,
+                    lonMin: 0,
+                    lonSec: 0,     
+                }
+            },
+            methods: {
+                jack(){
+                    console.log(this.latDeg);
+                }
+            },
+            computed: {
+                latitudeDecimal(){
+                    return (parseFloat(this.latDeg) + parseFloat(this.latMin) / 60 + parseFloat(this.latSec) / 3600).toFixed(10);
+                },
+                longitudeDecimal(){
+                    return (parseFloat(this.lonDeg) + parseFloat(this.lonMin) / 60 + parseFloat(this.lonSec) / 3600).toFixed(10);
+                }
+            }
+            
+        });
+
+        App.mount('#app');
+    </script>
+</body>
+</html>
